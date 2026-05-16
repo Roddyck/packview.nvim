@@ -79,8 +79,17 @@ M.setup = function(opts)
   end, { nargs = "*" })
 
   vim.api.nvim_create_user_command("PackDel", function(args)
-    vim.pack.del(args.fargs)
-  end, { nargs = "+" })
+    if #args.fargs == 0 then
+      local plugins = vim.pack.get()
+      local inactive_plugins = vim.tbl_filter(function(plugin)
+        return not plugin.active
+      end, plugins)
+
+      vim.pack.del(inactive_plugins)
+    else
+      vim.pack.del(args.fargs)
+    end
+  end, { nargs = "*" })
 end
 
 return M
