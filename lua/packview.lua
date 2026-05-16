@@ -38,13 +38,15 @@ local function setup_keymaps(win, buf)
   end, { buffer = buf })
 
   vim.keymap.set("n", "X", function()
-    local plugins = vim.pack.get()
+    local plugins_info = vim.pack.get()
 
     local inactive_plugins = vim.tbl_filter(function(plugin)
       return not plugin.active
-    end, plugins)
+    end, plugins_info)
 
-    vim.pack.del(inactive_plugins)
+    vim.pack.del(vim.tbl_map(function(plugin)
+      return plugin.spec.name
+    end, inactive_plugins))
   end, { buffer = buf })
 end
 
@@ -85,7 +87,9 @@ M.setup = function(opts)
         return not plugin.active
       end, plugins)
 
-      vim.pack.del(inactive_plugins)
+      vim.pack.del(vim.tbl_map(function(plugin)
+        return plugin.spec.name
+      end, inactive_plugins))
     else
       vim.pack.del(args.fargs)
     end
