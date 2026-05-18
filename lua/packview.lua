@@ -8,6 +8,19 @@ M._state = {
   plugins = {},
 }
 
+M._remove_from_state = function(plugin_name)
+  local idx_to_remove = nil
+
+  for i, plugin in ipairs(M._state.plugins) do
+    if plugin.spec.name == plugin_name then
+      idx_to_remove = i
+      break
+    end
+  end
+
+  table.remove(M._state.plugins, idx_to_remove)
+end
+
 local function setup_keymaps(win, buf)
   vim.keymap.set("n", "q", function()
     vim.api.nvim_win_close(win, true)
@@ -41,6 +54,7 @@ local function setup_keymaps(win, buf)
     end
 
     vim.pack.del({ plug })
+    M._remove_from_state(plug)
   end, { buffer = buf })
 
   vim.keymap.set("n", "X", function()
@@ -53,6 +67,10 @@ local function setup_keymaps(win, buf)
     vim.pack.del(vim.tbl_map(function(plugin)
       return plugin.spec.name
     end, inactive_plugins))
+
+    for _, plugin in ipairs(inactive_plugins) do
+      M._remove_from_state(plugin.spec.name)
+    end
   end, { buffer = buf })
 end
 
