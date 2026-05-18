@@ -42,21 +42,36 @@ M.set_buf_contents = function(buf, plugins)
   table.insert(lines, string.format("Total: %d plugins", #plugins))
   table.insert(lines, "")
 
-  -- TODO: don't hardcode these
-  -- and handle resizing
-  local name_width = 80
+  local name_width = 40
   local version_width = 20
-  local active_width = 20
-  local header = string.format("%-80s %-20s %-20s", "Name", "Version", "Active")
-  table.insert(lines, header)
 
-  for _, plugin in ipairs(plugins) do
+  local active_plugins = vim.tbl_filter(function(plugin)
+    return plugin.active
+  end, plugins)
+
+  table.insert(lines, string.format("Active (%d)", #active_plugins))
+  for _, plugin in ipairs(active_plugins) do
     local name = plugin.spec.name
     local version = plugin.spec.version or plugin.branches[1]
-    local active = plugin.active
 
-    local line = string.format("%-80s %-20s %-20s", name, version, active)
+    local line = string.format("• %-40s %-20s", name, version)
     table.insert(lines, line)
+  end
+
+  local inactive_plugins = vim.tbl_filter(function(plugin)
+    return not plugin.active
+  end, plugins)
+
+  if #inactive_plugins > 0 then
+    table.insert(lines, "")
+    table.insert(lines, string.format("Inactive (%d)", #inactive_plugins))
+    for _, plugin in ipairs(inactive_plugins) do
+      local name = plugin.spec.name
+      local version = plugin.spec.version or plugin.branches[1]
+
+      local line = string.format("• %-40s %-20s", name, version)
+      table.insert(lines, line)
+    end
   end
 
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -81,15 +96,15 @@ M.set_buf_contents = function(buf, plugins)
 
   vim.api.nvim_buf_set_extmark(buf, ns_id, 2, 0, {
     line_hl_group = "PackviewTotal",
-    end_row = 0,
+    end_row = 2,
   })
 
   vim.api.nvim_buf_set_extmark(buf, ns_id, 4, 0, {
     line_hl_group = "PackviewHeader",
-    end_row = 2,
+    end_row = 4,
   })
 
-  for i = 5, #lines - 1 do
+  for i = 5, #active_plugins - 1 + 5 do
     vim.api.nvim_buf_set_extmark(buf, ns_id, i, 0, {
       line_hl_group = "PackviewLine",
       end_row = i,
@@ -97,18 +112,37 @@ M.set_buf_contents = function(buf, plugins)
 
     vim.api.nvim_buf_set_extmark(buf, ns_id, i, 0, {
       hl_group = "PackviewName",
-      end_col = name_width,
+      end_col = name_width + 2,
     })
 
     vim.api.nvim_buf_set_extmark(buf, ns_id, i, name_width, {
       hl_group = "PackviewVersion",
-      end_col = name_width + version_width,
+      end_col = name_width + version_width + 2,
+    })
+  end
+
+  if #inactive_plugins > 0 then
+    vim.api.nvim_buf_set_extmark(buf, ns_id, #active_plugins + 5 + 1, 0, {
+      line_hl_group = "PackviewHeader",
+      end_row = #active_plugins + 5,
     })
 
-    vim.api.nvim_buf_set_extmark(buf, ns_id, i, name_width + version_width, {
-      hl_group = "PackviewActive",
-      end_col = name_width + version_width + active_width,
-    })
+    for i = #active_plugins + 1 + 5 + 1, #lines - 1 do
+      vim.api.nvim_buf_set_extmark(buf, ns_id, i, 0, {
+        line_hl_group = "PackviewLine",
+        end_row = i,
+      })
+
+      vim.api.nvim_buf_set_extmark(buf, ns_id, i, 0, {
+        hl_group = "PackviewName",
+        end_col = name_width + 2,
+      })
+
+      vim.api.nvim_buf_set_extmark(buf, ns_id, i, name_width, {
+        hl_group = "PackviewVersion",
+        end_col = name_width + version_width + 2,
+      })
+    end
   end
 end
 
