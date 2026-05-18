@@ -14,7 +14,7 @@ Main features:
 ```lua
 vim.pack.add({ "https://github.com/Roddyck/packview.nvim" })
 
-require("packview").setup() -- mandatory, as it sets up user commnds and highlights
+require("packview").setup() -- required only if you want to pass custom options
 ```
 
 <details>
