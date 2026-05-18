@@ -1,24 +1,8 @@
 local config = require("config")
 local utils = require("utils")
+local state = require("state")
 
 local M = {}
-
-M._state = {
-  plugins = {},
-}
-
-M._remove_from_state = function(plugin_name)
-  local idx_to_remove = nil
-
-  for i, plugin in ipairs(M._state.plugins) do
-    if plugin.spec.name == plugin_name then
-      idx_to_remove = i
-      break
-    end
-  end
-
-  table.remove(M._state.plugins, idx_to_remove)
-end
 
 local function setup_keymaps(win, buf)
   vim.keymap.set("n", "q", function()
@@ -53,7 +37,7 @@ local function setup_keymaps(win, buf)
     end
 
     vim.pack.del({ plug })
-    M._remove_from_state(plug)
+    state:remove_from_state(plug)
   end, { buffer = buf })
 
   vim.keymap.set("n", "X", function()
@@ -68,14 +52,14 @@ local function setup_keymaps(win, buf)
     end, inactive_plugins))
 
     for _, plugin in ipairs(inactive_plugins) do
-      M._remove_from_state(plugin.spec.name)
+      state:remove_from_state(plugin.spec.name)
     end
   end, { buffer = buf })
 end
 
 M.open = function()
   local float = utils.create_floating_win(config.options.window)
-  utils.set_buf_contents(float.buf, M._state.plugins)
+  utils.set_buf_contents(float.buf, state.plugins)
   setup_keymaps(float.win, float.buf)
 
   vim.api.nvim_set_option_value("modifiable", false, { buf = float.buf })

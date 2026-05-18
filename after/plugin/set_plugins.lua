@@ -1,2 +1,2 @@
-local packview = require("packview")
-packview._state.plugins = vim.pack.get()
+local state = require("state")
+state.plugins = vim.pack.get()
