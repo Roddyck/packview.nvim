@@ -1,4 +1,3 @@
-local colors = require("colors")
 local config = require("config")
 local utils = require("utils")
 
@@ -87,34 +86,6 @@ end
 ---@param opts packview.options?
 M.setup = function(opts)
   config.extend(opts)
-  colors.setup_highlights()
-
-  vim.api.nvim_create_user_command("Pack", function()
-    M.open()
-  end, {})
-
-  vim.api.nvim_create_user_command("PackUpdate", function(args)
-    if #args.fargs == 0 then
-      vim.pack.update()
-    else
-      vim.pack.update(args.fargs)
-    end
-  end, { nargs = "*" })
-
-  vim.api.nvim_create_user_command("PackDel", function(args)
-    if #args.fargs == 0 then
-      local plugins = vim.pack.get()
-      local inactive_plugins = vim.tbl_filter(function(plugin)
-        return not plugin.active
-      end, plugins)
-
-      vim.pack.del(vim.tbl_map(function(plugin)
-        return plugin.spec.name
-      end, inactive_plugins))
-    else
-      vim.pack.del(args.fargs)
-    end
-  end, { nargs = "*" })
 end
 
 return M
