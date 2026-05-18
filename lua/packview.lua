@@ -2,6 +2,12 @@ local colors = require("colors")
 local config = require("config")
 local utils = require("utils")
 
+local M = {}
+
+M._state = {
+  plugins = {},
+}
+
 local function setup_keymaps(win, buf)
   vim.keymap.set("n", "q", function()
     vim.api.nvim_win_close(win, true)
@@ -50,12 +56,9 @@ local function setup_keymaps(win, buf)
   end, { buffer = buf })
 end
 
-local M = {}
-
 M.open = function()
   local float = utils.create_floating_win(config.options.window)
-  local plugins = vim.pack.get()
-  utils.set_buf_contents(float.buf, plugins)
+  utils.set_buf_contents(float.buf, M._state.plugins)
   setup_keymaps(float.win, float.buf)
 
   vim.api.nvim_set_option_value("modifiable", false, { buf = float.buf })
