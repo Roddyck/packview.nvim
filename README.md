@@ -1,6 +1,8 @@
 # packview.nvim
 Just another minimal UI for vim.pack with some conveniences, because I can and want to.
 
+<img width="1539" height="842" alt="Preview" src="https://github.com/user-attachments/assets/f287ad52-b6d2-4e15-a566-59a5019ac7f0" />
+
 Main features:
 - Floating window with list of installed plugins
 - Keymaps to update all, update selected, delete selected or delete all inactive plugins
