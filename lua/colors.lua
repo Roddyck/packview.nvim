@@ -2,11 +2,16 @@ local M = {}
 
 M.colors = {
   Line = "NormalFloat",
-  Header = { bold = true },
-  Total = {
-    bold = true,
-    bg = vim.api.nvim_get_hl(0, { name = "WinBar" }).bg,
+  But = {
+    fg = vim.api.nvim_get_hl(0, { name = "NormalFloat" }).fg,
+    bg = vim.api.nvim_get_hl(0, { name = "Visual" }).bg,
   },
+  Help = {
+    fg = vim.api.nvim_get_hl(0, { name = "DiagnosticInfo" }).fg,
+    bg = vim.api.nvim_get_hl(0, { name = "Visual" }).bg,
+  },
+  Header = { bold = true },
+  Total = { bold = true },
   Name = "Directory",
   Version = "DiagnosticHint",
   Active = "Boolean",

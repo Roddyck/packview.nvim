@@ -1,3 +1,5 @@
+local config = require("config")
+
 local M = {}
 
 ---@param opts packview.options.window
@@ -30,9 +32,18 @@ end
 M.set_buf_contents = function(buf, plugins)
   local lines = {}
 
+  local win_width = math.floor(vim.o.columns * config.options.window.width)
+  local topbar = "[u] Update [U] Update all [d] Delete [X] Clean"
+  local topbar_padding = string.rep(" ", math.floor((win_width - #topbar) / 2))
+
+  table.insert(lines, string.format("%s%s", topbar_padding, topbar))
+  table.insert(lines, "")
+
   table.insert(lines, string.format("Total: %d plugins", #plugins))
   table.insert(lines, "")
 
+  -- TODO: don't hardcode these
+  -- and handle resizing
   local name_width = 80
   local version_width = 20
   local active_width = 20
@@ -52,17 +63,33 @@ M.set_buf_contents = function(buf, plugins)
 
   local ns_id = vim.api.nvim_create_namespace("packview")
 
-  vim.api.nvim_buf_set_extmark(buf, ns_id, 0, 0, {
+  local set_topbar_extmarks = function(offset, len)
+    vim.api.nvim_buf_set_extmark(buf, ns_id, 0, #topbar_padding + offset, {
+      hl_group = "PackviewHelp",
+      end_col = #topbar_padding + offset + 3,
+    })
+    vim.api.nvim_buf_set_extmark(buf, ns_id, 0, #topbar_padding + offset, {
+      hl_group = "PackviewBut",
+      end_col = #topbar_padding + offset + len,
+    })
+  end
+
+  set_topbar_extmarks(0, 10)
+  set_topbar_extmarks(11, 14)
+  set_topbar_extmarks(26, 10)
+  set_topbar_extmarks(37, 9)
+
+  vim.api.nvim_buf_set_extmark(buf, ns_id, 2, 0, {
     line_hl_group = "PackviewTotal",
     end_row = 0,
   })
 
-  vim.api.nvim_buf_set_extmark(buf, ns_id, 2, 0, {
+  vim.api.nvim_buf_set_extmark(buf, ns_id, 4, 0, {
     line_hl_group = "PackviewHeader",
     end_row = 2,
   })
 
-  for i = 3, #lines - 1 do
+  for i = 5, #lines - 1 do
     vim.api.nvim_buf_set_extmark(buf, ns_id, i, 0, {
       line_hl_group = "PackviewLine",
       end_row = i,
