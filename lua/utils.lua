@@ -45,6 +45,7 @@ M.set_buf_contents = function(buf, plugins)
   local name_width = 40
   local version_width = 20
 
+  ---@type vim.pack.PlugData[]
   local active_plugins = vim.tbl_filter(function(plugin)
     return plugin.active
   end, plugins)
@@ -58,6 +59,7 @@ M.set_buf_contents = function(buf, plugins)
     table.insert(lines, line)
   end
 
+  ---@type vim.pack.PlugData[]
   local inactive_plugins = vim.tbl_filter(function(plugin)
     return not plugin.active
   end, plugins)
@@ -147,7 +149,7 @@ M.set_buf_contents = function(buf, plugins)
 end
 
 M.get_plugin_name = function(line)
-  local name = line:match("^(%S+)")
+  local name = string.match(line, "•%s(%S*)")
   return name
 end
 

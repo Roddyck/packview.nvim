@@ -1,6 +1,5 @@
 local colors = require("colors")
 local packview = require("packview")
-local state = require("state")
 
 colors.setup_highlights()
 
@@ -26,15 +25,7 @@ vim.api.nvim_create_user_command("PackDel", function(args)
     vim.pack.del(vim.tbl_map(function(plugin)
       return plugin.spec.name
     end, inactive_plugins))
-
-    for _, plugin in ipairs(inactive_plugins) do
-      state:remove_from_state(plugin.spec.name)
-    end
   else
     vim.pack.del(args.fargs)
-
-    for _, plugin_name in ipairs(args.fargs) do
-      state:remove_from_state(plugin_name)
-    end
   end
 end, { nargs = "*" })

@@ -1,6 +1,5 @@
 local config = require("config")
 local utils = require("utils")
-local state = require("state")
 
 local M = {}
 
@@ -37,7 +36,6 @@ local function setup_keymaps(win, buf)
     end
 
     vim.pack.del({ plug })
-    state:remove_from_state(plug)
   end, { buffer = buf })
 
   vim.keymap.set("n", "X", function()
@@ -50,16 +48,13 @@ local function setup_keymaps(win, buf)
     vim.pack.del(vim.tbl_map(function(plugin)
       return plugin.spec.name
     end, inactive_plugins))
-
-    for _, plugin in ipairs(inactive_plugins) do
-      state:remove_from_state(plugin.spec.name)
-    end
   end, { buffer = buf })
 end
 
 M.open = function()
   local float = utils.create_floating_win(config.options.window)
-  utils.set_buf_contents(float.buf, state.plugins)
+  local plugins = vim.pack.get()
+  utils.set_buf_contents(float.buf, plugins)
   setup_keymaps(float.win, float.buf)
 
   vim.api.nvim_set_option_value("modifiable", false, { buf = float.buf })
